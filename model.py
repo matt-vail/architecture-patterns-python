@@ -7,6 +7,8 @@ from typing import Optional, List, Set
 class OutOfStock(Exception):
     pass
 
+class ReferenceNotFound(Exception):
+    pass
 
 def allocate(line: OrderLine, batches: List[Batch]) -> str:
     try:
@@ -16,6 +18,13 @@ def allocate(line: OrderLine, batches: List[Batch]) -> str:
     except StopIteration:
         raise OutOfStock(f"Out of stock for sku {line.sku}")
 
+def deallocate(line: OrderLine, Batches: List[Batch]) -> str:
+    try:
+        batch = next(b for b in Batches if b.sku == line.sku)
+        batch.deallocate(line)
+        return batch.reference
+    except StopIteration:
+        return ReferenceNotFound(f"Reference not found for sku {line.sku}")
 
 @dataclass(unsafe_hash=True)
 class OrderLine:
